@@ -1,0 +1,13 @@
+-f https://download.pytorch.org/whl/cpu/torch_stable.html
+gradio
+transformers
+fasttext
+huggingface_hub
+requests
+datasets
+tokenizers
+torch
+environ-config
+sentencepiece
+rich
+protobuf
