@@ -283,7 +283,7 @@ def main():
         interpretation="default",
     )
 
-    iface.launch()
+    iface.launch(debug=True)
 
 
 if __name__ == "__main__":
