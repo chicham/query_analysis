@@ -201,6 +201,7 @@ def predict(
                 ((word, mapping[word]), (" ", None)) for word, _ in query_processed
             ),
         )
+        print(res)
         return res
 
     languages = predict_lang(query)
