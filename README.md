@@ -10,6 +10,8 @@ pinned: false
 
 # Configuration
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/chicham/query_analysis/main.svg)](https://results.pre-commit.ci/latest/github/chicham/query_analysis/main)
+
 `title`: _string_
 Display title for the Space
 
