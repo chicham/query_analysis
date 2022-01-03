@@ -1,19 +1,22 @@
 """Demo gradio app for some text/query augmentation."""
-
 from __future__ import annotations
-from collections import defaultdict
+
 import functools
+from collections import defaultdict
 from itertools import chain
-from typing import Any, Callable, Mapping, Optional, Sequence, Tuple
+from typing import Any
+from typing import Callable
+from typing import Mapping
+from typing import Sequence
 
 import attr
 import environ
 import fasttext  # not working with python3.9
 import gradio as gr
+from tokenizers.pre_tokenizers import Whitespace
 from transformers.pipelines import pipeline
 from transformers.pipelines.base import Pipeline
 from transformers.pipelines.token_classification import AggregationStrategy
-from tokenizers.pre_tokenizers import Whitespace
 
 
 def compose(*functions) -> Callable:
@@ -105,9 +108,8 @@ class AppConfig:
 
     @environ.config
     class NER:
-        # general = environ.var(default="Davlan/xlm-roberta-base-ner-hrl")
         general = environ.var(
-            default="asahi417/tner-xlm-roberta-large-uncased-wnut2017"
+            default="asahi417/tner-xlm-roberta-large-uncased-wnut2017",
         )
 
         recipe = environ.var(default="adamlin/recipe-tag-model")
@@ -122,13 +124,13 @@ def predict(
     models: Models,
     query: str,
     categories: Sequence[str],
-    supported_languages: Tuple[str, ...] = ("fr", "de"),
-) -> Tuple[
+    supported_languages: tuple[str, ...] = ("fr", "de"),
+) -> tuple[
     Mapping[str, float],
     str,
     Mapping[str, float],
-    Sequence[Tuple[str, Optional[str]]],
-    Sequence[Tuple[str, Optional[str]]],
+    Sequence[tuple[str, str | None]],
+    Sequence[tuple[str, str | None]],
 ]:
     """Predict from a textual query:
     - the language
@@ -146,7 +148,8 @@ def predict(
         @mapped(map)
         def format_label(prediction: Prediction) -> Prediction:
             return attr.evolve(
-                prediction, label=prediction.label.replace("__label__", "")
+                prediction,
+                label=prediction.label.replace("__label__", ""),
             )
 
         def filter_labels(prediction: Prediction) -> bool:
@@ -183,8 +186,9 @@ def predict(
         return dict(zip(predictions["labels"], predictions["scores"]))
 
     def extract_entities(
-        predict_fn: Callable, query: str
-    ) -> Sequence[Tuple[str, Optional[str]]]:
+        predict_fn: Callable,
+        query: str,
+    ) -> Sequence[tuple[str, str | None]]:
         def get_entity(pred: Mapping[str, str]):
             return pred.get("entity", pred.get("entity_group", None))
 
@@ -195,7 +199,7 @@ def predict(
         res = tuple(
             chain.from_iterable(
                 ((word, mapping[word]), (" ", None)) for word, _ in query_processed
-            )
+            ),
         )
         return res
 
@@ -211,7 +215,9 @@ def main():
     cfg: AppConfig = AppConfig.from_environ()
 
     def load_translation_models(
-        sources: Sequence[str], target: str, models: Sequence[str]
+        sources: Sequence[str],
+        target: str,
+        models: Sequence[str],
     ) -> Pipeline:
         result = {
             src: pipeline(f"translation_{src}_to_{target}", models)
@@ -238,7 +244,8 @@ def main():
         ),
         classification=Predictor(
             load_fn=lambda: pipeline(
-                "zero-shot-classification", model=cfg.classification.model
+                "zero-shot-classification",
+                model=cfg.classification.model,
             ),
             predict_fn=lambda model, query, categories: model(query, categories),
         ),
@@ -256,7 +263,9 @@ def main():
 
     iface = gr.Interface(
         fn=lambda query, categories: predict(
-            models, query.strip(), extract_commas_separated_values(categories)
+            models,
+            query.strip(),
+            extract_commas_separated_values(categories),
         ),
         examples=[["gateau au chocolat paris"], ["Newyork LA flight"]],
         inputs=[
