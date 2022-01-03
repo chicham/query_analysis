@@ -107,7 +107,7 @@ class AppConfig:
     class NER:
         # general = environ.var(default="Davlan/xlm-roberta-base-ner-hrl")
         general = environ.var(
-            default="asahi417/tner-xlm-roberta-base-uncased-ontonotes5"
+            default="asahi417/tner-xlm-roberta-large-uncased-wnut2017"
         )
 
         recipe = environ.var(default="adamlin/recipe-tag-model")
