@@ -253,7 +253,7 @@ def main():
             load_fn=lambda: pipeline(
                 "ner",
                 model=cfg.ner.general,
-                aggregation_strategy=AggregationStrategy.SIMPLE,
+                aggregation_strategy=AggregationStrategy.MAX,
             ),
         ),
         recipe=Predictor(
